@@ -9,6 +9,7 @@ Several other repos already use this mechanism:
 - [serverless-webrtc-qrcode](https://github.com/fta2012/serverless-webrtc-qrcode)
 - [webrtc-qr](https://github.com/AquiGorka/webrtc-qr)
 - [webrtc-qr-signaling-channel](https://github.com/TomasHubelbauer/webrtc-qr-signaling-channel)
+
 However they only provide proof of concept and not a simple package anyone can use.
 
 ## Connection process
