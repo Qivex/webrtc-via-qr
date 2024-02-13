@@ -1,0 +1,13 @@
+{
+	"name": "webrtc-via-qr",
+	"version": "0.0.0"
+	"description": "Establish a WebRTC connection by scanning QR codes",
+	"keywords": [
+		"webrtc",
+		"qr"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Qivex/webrtc-via-qr.git"
+	}
+}
