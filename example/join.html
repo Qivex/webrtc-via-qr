@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<!-- HTML boilerplate -->
+		<meta charset="utf8"/>
+		<title>Join (WebRTC via QR example)</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+		<link rel="icon" href="/favicon.ico"/>
+		<!-- Petite Vue -->
+		<script src="https://unpkg.com/petite-vue@0.4.1/dist/petite-vue.iife.js" defer init></script>
+		<!-- Example script -->
+		<script type="module">
+			import { UserConnection } from "../"	// from "webrtc-via-qr"
+			let u = new UserConnection()
+		</script>
+	</head>
+	<body v-scope>
+		<p>Join</p>
+	</body>
+</html>
