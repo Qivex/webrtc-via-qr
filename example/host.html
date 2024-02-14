@@ -12,6 +12,7 @@
 		<script type="module">
 			import { HostConnection } from "../"	// from "webrtc-via-qr"
 			let h = new HostConnection()
+			h.createInvite().then(result => console.log(result))
 		</script>
 	</head>
 	<body v-scope>

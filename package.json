@@ -19,7 +19,7 @@
 		"vite": "*"
 	},
 	"scripts": {
-		"dev": "vite",
+		"dev": "vite --host",
 		"build": "vite build",
 		"prev": "vite preview --host"
 	}
