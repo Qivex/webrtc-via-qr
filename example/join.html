@@ -12,6 +12,12 @@
 		<script type="module">
 			import { UserConnection } from "../"	// from "webrtc-via-qr"
 			let u = new UserConnection()
+			// Assume this page was opened from QR code (link like "localhost:5173/example/join.html?invite=...")
+			let params = new URLSearchParams(window.location.search)
+			let inviteCode = params.get("invite")
+			console.assert(typeof inviteCode === "string" && inviteCode.length > 0, "Open this from QR code (missing URL param 'invite')")
+			u.acceptInvite(inviteCode)
+				.then(result => console.log(result))
 		</script>
 	</head>
 	<body v-scope>
