@@ -11,12 +11,18 @@
 		<!-- Example script -->
 		<script type="module">
 			import { HostConnection } from "../"	// from "webrtc-via-qr"
+			import QRCode from "qrcode"
 			let h = new HostConnection()
 			h.createInvite("test")
-				.then(result => console.log(result))
+				.then(invite => {
+					window.inv.textContent = invite
+					QRCode.toCanvas(window.qr, "http://192.168.0.154:5173/example/join.html?invite=" + invite)
+				})
 		</script>
 	</head>
 	<body v-scope>
 		<p>Host</p>
+		<p id="inv"></p>
+		<canvas id="qr" style="max-width:300px;max-height:300px"></canvas>
 	</body>
 </html>

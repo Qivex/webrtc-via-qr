@@ -12,6 +12,7 @@
 		"url": "https://github.com/Qivex/webrtc-via-qr.git"
 	},
 	"dependencies": {
+		"qrcode": "*",
 		"jsqr": "*",
 		"zxing-js-library": "*"
 	},
