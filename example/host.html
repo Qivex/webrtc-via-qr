@@ -12,7 +12,7 @@
 		<script type="module">
 			import { HostConnection } from "../"	// from "webrtc-via-qr"
 			let h = new HostConnection()
-			h.createInvite()
+			h.createInvite("test")
 				.then(result => console.log(result))
 		</script>
 	</head>
