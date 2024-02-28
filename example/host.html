@@ -7,22 +7,79 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 		<link rel="icon" href="/favicon.ico"/>
 		<!-- Petite Vue -->
-		<script src="https://unpkg.com/petite-vue@0.4.1/dist/petite-vue.iife.js" defer init></script>
+		<script src="https://unpkg.com/petite-vue@0.4.1/dist/petite-vue.iife.js" defer></script>
 		<!-- Example script -->
 		<script type="module">
 			import { HostConnection } from "../"	// from "webrtc-via-qr"
 			import QRCode from "qrcode"
+			import jsQR from "jsqr"
+
 			let h = new HostConnection()
 			h.createInvite("test")
 				.then(invite => {
 					window.inv.textContent = invite
 					QRCode.toCanvas(window.qr, "http://192.168.0.154:5173/example/join.html?invite=" + invite)
 				})
+			
+			let streamRefForClosing, running
+			function startScanning(canvas) {
+				console.log("Starting scan")
+				running = true
+				const video = document.createElement("video")
+				const ctx = canvas.getContext("2d")
+				ctx.willReadFrequently = true	// Use GPU memory
+
+				navigator.mediaDevices.getUserMedia({video:{facingMode:"environment", frameRate:{ideal: 10}}})	// Limited FPS for now
+					.then(stream => {
+						streamRefForClosing = stream
+						video.srcObject = stream
+						video.play()
+						video.requestVideoFrameCallback(tick)	// Not working in Firefox!
+						// requestAnimationFrame(tick)
+					})
+				
+				function tick() {
+					if (video.readyState === video.HAVE_ENOUGH_DATA) {
+						ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+						// Actual scanning
+						const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height)
+						const code = jsQR(pixels.data, pixels.width, pixels.height, {inversionAttempts: "dontInvert"})
+						if (code) {
+							h.acceptInvite(code)
+						}
+					}
+					if (running) {
+						video.requestVideoFrameCallback(tick)	// Not working in Firefox!
+						// requestAnimationFrame(tick)
+					}
+				}
+			}
+
+			function stopScanning(canvas) {
+				console.log("Stopping scan")
+				streamRefForClosing.getTracks().forEach(track => track.stop())
+				running = false
+			}
+
+			// PetiteVue Init
+			PetiteVue.createApp({
+				inviting: true,
+				scanning: false,
+				startScanning,
+				stopScanning
+			}).mount(document.body)
 		</script>
 	</head>
-	<body v-scope>
+	<body>
 		<p>Host</p>
-		<p id="inv"></p>
-		<canvas id="qr" style="max-width:300px;max-height:300px"></canvas>
+		<button @click="inviting=!inviting">{{inviting ? "Accept" : "Create"}} invite</button>
+		<div v-show="inviting">
+			<p id="inv"></p>
+			<canvas id="qr" style="max-width:300px;max-height:300px"></canvas>
+		</div>
+		<div v-show="!inviting">
+			<button @click="scanning=!scanning">Toggle scanning</button><br>
+			<canvas id="scan" width="640" height="360" v-if="scanning" @vue:mounted="startScanning($el)" @vue:unmounted="stopScanning($el)"></canvas>
+		</div>
 	</body>
 </html>
