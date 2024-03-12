@@ -21,7 +21,7 @@
 			})
 			h.on("message", (con, msg) => console.log(msg))
 
-			h.createInvite("test")
+			h.createInvite()
 				.then(invite => {
 					window.inv.textContent = invite
 					QRCode.toCanvas(window.qr, "http://192.168.0.154:5173/example/join.html?invite=" + invite)
