@@ -15,6 +15,12 @@
 			import jsQR from "jsqr"
 
 			let h = new HostConnection()
+			h.on("connect", (con, rec_channel) => {
+				console.log(con, rec_channel)
+				con.sendChannel.send("from host: connection established")
+			})
+			h.on("message", (con, msg) => console.log(msg))
+
 			h.createInvite("test")
 				.then(invite => {
 					window.inv.textContent = invite
@@ -29,7 +35,7 @@
 				const ctx = canvas.getContext("2d")
 				ctx.willReadFrequently = true	// Use GPU memory
 
-				navigator.mediaDevices.getUserMedia({video:{facingMode:"environment", frameRate:{ideal: 10}}})	// Limited FPS for now
+				window.navigator.mediaDevices.getUserMedia({video:{facingMode:"environment", frameRate:{ideal: 10}}})	// Limited FPS for now
 					.then(stream => {
 						streamRefForClosing = stream
 						video.srcObject = stream
@@ -45,7 +51,8 @@
 						const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height)
 						const code = jsQR(pixels.data, pixels.width, pixels.height, {inversionAttempts: "dontInvert"})
 						if (code) {
-							h.acceptInvite(code)
+							h.confirmAccept(code.data)
+							running = false
 						}
 					}
 					if (running) {

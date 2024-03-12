@@ -13,6 +13,12 @@
 			import { UserConnection } from "../"	// from "webrtc-via-qr"
 			import QRCode from "qrcode"
 			let u = new UserConnection()
+			u.on("connect", (con, rec_channel) => {
+				console.log(con, rec_channel)
+				con.sendChannel.send("from user: connection established")
+			})
+			u.on("message", (con, msg) => console.log(msg))
+
 			// Assume this page was opened from QR code (link like "localhost:5173/example/join.html?invite=...")
 			let params = new URLSearchParams(window.location.search)
 			let inviteCode = params.get("invite")
