@@ -6,33 +6,74 @@
 		<title>Join (WebRTC via QR example)</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 		<link rel="icon" href="/favicon.ico"/>
-		<!-- Petite Vue -->
-		<script src="https://unpkg.com/petite-vue@0.4.1/dist/petite-vue.iife.js" defer init></script>
 		<!-- Example script -->
 		<script type="module">
 			import { UserConnection } from "../"	// from "webrtc-via-qr"
 			import QRCode from "qrcode"
-			let u = new UserConnection()
-			u.on("connect", (con, rec_channel) => {
-				console.log(con, rec_channel)
-				con.sendChannel.send("from user: connection established")
-			})
-			u.on("message", (con, msg) => console.log(msg))
 
-			// Assume this page was opened from QR code (link like "localhost:5173/example/join.html?invite=...")
+			// Shortcut
+			function appendMessage(msg) {
+				let p = document.createElement("p")
+				p.textContent = msg
+				messages.appendChild(p)
+			}
+
+			// Assume this page was opened from QR code (= has URL param "invite")
 			let params = new URLSearchParams(window.location.search)
 			let inviteCode = params.get("invite")
-			console.assert(typeof inviteCode === "string" && inviteCode.length > 0, "Open this from QR code (missing URL param 'invite')")
-			u.acceptInvite(inviteCode)
-				.then(accept => {
-					window.acc.textContent = accept
-					QRCode.toCanvas(window.qr, accept)
+			if (typeof inviteCode === "string" && inviteCode.length > 0) {
+				// Respond to invite
+				let u = new UserConnection()
+				u.acceptInvite(inviteCode)
+					.then(accept => QRCode.toCanvas(qr, accept))
+				// Connection successful
+				u.on("connect", () => {
+					dialog.close()
+					chat.setAttribute("placeholder", "Enter message")
+					chat.removeAttribute("disabled")
+					appendMessage(`Connected successfuly @ ${Date.now()}`)
 				})
+				// Show incoming messages
+				u.on("message", (user, msg) => {
+					appendMessage(`${user}: ${msg}`)
+				})
+			} else {
+				dialog.close()
+				appendMessage("Connection failed: Param 'invite' was not included in URL (open this page from QR code!)")
+			}
 		</script>
+		<style>
+			body {
+				display: grid;
+			}
+			p {
+				margin: 0px;
+			}
+			#dialog {
+				align-self: center;
+			}
+			#qr {
+				max-width: 80vw;
+				max-height: 80vw;
+			}
+			#messages {
+				margin-top: 1rem;
+				padding: 1rem;
+				height: 70vh;
+				overflow: auto scroll;
+				border: 1px solid black;
+			}
+		</style>
 	</head>
-	<body v-scope>
-		<p>Join</p>
-		<p id="acc"></p>
-		<canvas id="qr" style="max-width:300px;max-height:300px"></canvas>
+	<body>
+		<dialog id="dialog" open>
+			<h2>Scanned by host</h2>
+			<canvas id="qr"/>
+		</dialog>
+		<h1>Join</h1>
+		<input type="text" id="chat" placeholder="Not connected" disabled/>
+		<div id="messages">
+			<p>Connecting...</p>
+		</div>
 	</body>
 </html>
